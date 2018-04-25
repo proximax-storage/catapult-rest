@@ -41,7 +41,9 @@ const PacketType = {
 	pushPartialTransactions: 500,
 
 	/** Detached cosignatures have been pushed by an api-node. */
-	pushDetachedCosignatures: 501
+	pushDetachedCosignatures: 501,
+
+	nodeDiscoveryPullPing: 601,
 };
 
 module.exports = PacketType;

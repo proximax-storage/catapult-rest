@@ -48,6 +48,20 @@ module.exports = {
 					connection.removeListener('close', rejectOnClose);
 					resolve();
 				});
-			})
+			}),
+
+		listen: () => new Promise((resolve, reject) => {
+			const rejectOnClose = () => {
+				reject(errors.createServiceUnavailableError('connection failed'));
+			};
+
+			connection.once('close', rejectOnClose);
+
+			connection.on('data', data => {
+				connection.removeListener('close', rejectOnClose);
+				console.log('data', data);
+				resolve(data);
+			});
+		}),
 	})
 };
