@@ -44,12 +44,12 @@ module.exports = {
 			const packetBuffer = createPacketFromBuffer('', PacketType.nodeDiscoveryPullPing);
 			return connections.lease()
 				.then(connection => {
-					const prom = connection.listen().then(message => {
-						res.send(200, {message: convert.uint8ToHex(message)});
-						next();
-					});
-					return connection.send(packetBuffer);
-				});
+					return connection.pushPull(packetBuffer);
+				})
+				.then(packet => {
+					res.send(200, {message: JSON.stringify(packet)});
+					next();
+				})
 		});
 	}
 };

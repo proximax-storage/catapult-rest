@@ -19,6 +19,9 @@
  */
 
 const errors = require('../server/errors');
+const catapult = require('catapult-sdk');
+
+const {PacketParser} = catapult.parser;
 
 /**
  * A catapult connection for interacting with api nodes.
@@ -43,25 +46,32 @@ module.exports = {
 				};
 
 				connection.once('close', rejectOnClose);
-
 				connection.write(payload, () => {
 					connection.removeListener('close', rejectOnClose);
 					resolve();
 				});
 			}),
 
-		listen: () => new Promise((resolve, reject) => {
-			const rejectOnClose = () => {
-				reject(errors.createServiceUnavailableError('connection failed'));
-			};
+		listen: handler => {
+			const packetParser = new PacketParser();
 
-			connection.once('close', rejectOnClose);
+			// connection.once('close', rejectOnClose);
 
 			connection.on('data', data => {
-				connection.removeListener('close', rejectOnClose);
-				console.log('data', data);
-				resolve(data);
+				packetParser.push(data);
 			});
-		}),
+
+			packetParser.onPacket(handler);
+		},
+
+		pushPull(payload) {
+			return new Promise((resolve, reject) => {
+				this.listen(packet => {
+					resolve(packet);
+				});
+				this.send(payload).then(ignored => {
+				}, reject)
+			});
+		}
 	})
 };
