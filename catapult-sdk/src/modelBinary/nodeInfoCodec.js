@@ -12,7 +12,7 @@ const nodeInfoCodec = {
 	 */
 	deserialize: parser => {
 		const nodeInfo = {};
-		const size = parser.uint32();
+		parser.uint32(); // size
 		nodeInfo.publicKey = convert.uint8ToHex(parser.buffer(constants.sizes.signer));
 		nodeInfo.port = parser.uint16();
 		nodeInfo.networkIdentifier = parser.uint16();
@@ -20,11 +20,13 @@ const nodeInfoCodec = {
 		nodeInfo.roles = parser.uint32();
 		const hostSize = parser.uint8();
 		const friendlyNameSize = parser.uint8();
-		nodeInfo.host = hostSize === 0 ? '' : convert.uint8ToHex(parser.buffer(hostSize));
-		nodeInfo.friendlyName = friendlyNameSize === 0 ? '' : convert.uint8ToHex(parser.buffer(friendlyNameSize));
+		nodeInfo.host = 0 === hostSize ? '' : convert.uint8ToHex(parser.buffer(hostSize));
+		nodeInfo.friendlyName = 0 === friendlyNameSize ? '' : convert.uint8ToHex(parser.buffer(friendlyNameSize));
 
 		return nodeInfo;
 	},
+
+	/* eslint-disable no-unused-vars */
 
 	/**
 	 * Serializes a node info.
@@ -34,6 +36,7 @@ const nodeInfoCodec = {
 	serialize: (nodeInfo, serializer) => {
 		throw new Error('NOT IMPLEMENTED');
 	}
+	/* eslint-enable */
 };
 
 module.exports = nodeInfoCodec;

@@ -21,7 +21,7 @@
 const errors = require('../server/errors');
 const catapult = require('catapult-sdk');
 
-const {PacketParser} = catapult.parser;
+const { PacketParser } = catapult.parser;
 
 /**
  * A catapult connection for interacting with api nodes.
@@ -73,8 +73,10 @@ module.exports = {
 				this.listen().then(packet => {
 					resolve(packet);
 				}, reject);
+				/* eslint-disable no-unused-vars */
 				this.send(payload).then(ignored => {
-				}, reject)
+				}, reject);
+				/* eslint-enable */
 			});
 		}
 	})

@@ -19,15 +19,16 @@
  */
 
 const catapult = require('catapult-sdk');
+
 const packetHeader = catapult.packet.header;
-const {PacketType} = catapult.packet;
+const { PacketType } = catapult.packet;
 
 const { nodeInfoCodec } = catapult.packet.packetCodecs;
 const { BinaryParser } = catapult.parser;
 
 module.exports = {
 	register: (server, db, services) => {
-		const connections = services.connections;
+		const { connections } = services;
 
 		server.get('/network', (req, res, next) => {
 			// forward entire config network section without formatting
@@ -44,15 +45,13 @@ module.exports = {
 			};
 			const packetBuffer = createPacketFromBuffer('', PacketType.nodeDiscoveryPullPing);
 			return connections.lease()
-				.then(connection => {
-					return connection.pushPull(packetBuffer);
-				})
+				.then(connection => connection.pushPull(packetBuffer))
 				.then(packet => {
 					const binaryParser = new BinaryParser();
 					binaryParser.push(packet.payload);
 					res.send(200, nodeInfoCodec.deserialize(binaryParser));
 					next();
-				})
+				});
 		});
 	}
 };
