@@ -50,7 +50,7 @@ module.exports = {
 				.then(packet => {
 					const binaryParser = new BinaryParser();
 					binaryParser.push(packet.payload);
-					res.send(200, {message: nodeInfoCodec.deserialize(binaryParser)});
+					res.send(200, nodeInfoCodec.deserialize(binaryParser));
 					next();
 				})
 		});

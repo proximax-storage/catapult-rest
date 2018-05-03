@@ -12,16 +12,16 @@ const nodeInfoCodec = {
 	 */
 	deserialize: parser => {
 		const nodeInfo = {};
-		nodeInfo.size = parser.uint32();
+		const size = parser.uint32();
 		nodeInfo.publicKey = convert.uint8ToHex(parser.buffer(constants.sizes.signer));
 		nodeInfo.port = parser.uint16();
 		nodeInfo.networkIdentifier = parser.uint16();
 		nodeInfo.version = parser.uint16();
-		nodeInfo.roles = parser.uint16();
-		nodeInfo.hostSize = parser.uint16();
-		nodeInfo.friendlyNameSize = parser.uint16();
-		nodeInfo.host = '';
-		nodeInfo.friendlyName = '';
+		nodeInfo.roles = parser.uint32();
+		const hostSize = parser.uint8();
+		const friendlyNameSize = parser.uint8();
+		nodeInfo.host = hostSize === 0 ? '' : convert.uint8ToHex(parser.buffer(hostSize));
+		nodeInfo.friendlyName = friendlyNameSize === 0 ? '' : convert.uint8ToHex(parser.buffer(friendlyNameSize));
 
 		return nodeInfo;
 	},
