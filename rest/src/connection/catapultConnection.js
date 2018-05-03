@@ -52,23 +52,27 @@ module.exports = {
 				});
 			}),
 
-		listen: handler => {
+		listen: () => new Promise((resolve, reject) => {
+			const rejectOnClose = () => {
+				reject(errors.createServiceUnavailableError('connection failed'));
+			};
+
 			const packetParser = new PacketParser();
 
-			// connection.once('close', rejectOnClose);
+			connection.once('close', rejectOnClose);
 
 			connection.on('data', data => {
 				packetParser.push(data);
 			});
 
-			packetParser.onPacket(handler);
-		},
+			packetParser.onPacket(resolve);
+		}),
 
 		pushPull(payload) {
 			return new Promise((resolve, reject) => {
-				this.listen(packet => {
+				this.listen().then(packet => {
 					resolve(packet);
-				});
+				}, reject);
 				this.send(payload).then(ignored => {
 				}, reject)
 			});
