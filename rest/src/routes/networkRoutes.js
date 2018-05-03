@@ -22,7 +22,8 @@ const catapult = require('catapult-sdk');
 const packetHeader = catapult.packet.header;
 const {PacketType} = catapult.packet;
 
-const {convert} = catapult.utils;
+const { nodeInfoCodec } = catapult.packet.packetCodecs;
+const { BinaryParser } = catapult.parser;
 
 module.exports = {
 	register: (server, db, services) => {
@@ -47,7 +48,9 @@ module.exports = {
 					return connection.pushPull(packetBuffer);
 				})
 				.then(packet => {
-					res.send(200, {message: JSON.stringify(packet)});
+					const binaryParser = new BinaryParser();
+					binaryParser.push(packet.payload);
+					res.send(200, {message: nodeInfoCodec.deserialize(binaryParser)});
 					next();
 				})
 		});

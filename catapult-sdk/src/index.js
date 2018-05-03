@@ -46,6 +46,7 @@ const objects = require('./utils/objects');
 const schemaFormatter = require('./utils/schemaFormatter');
 const SchemaType = require('./utils/SchemaType');
 const uint64 = require('./utils/uint64');
+const nodeInfoCodec = require('./modelBinary/nodeInfoCodec');
 
 const catapultSdk = {
 	auth,
@@ -72,7 +73,10 @@ const catapultSdk = {
 	},
 	packet: {
 		header: packetHeader,
-		PacketType
+		PacketType,
+		packetCodecs: {
+			nodeInfoCodec
+		}
 	},
 	parser: {
 		BinaryParser,
