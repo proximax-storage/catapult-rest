@@ -45,8 +45,8 @@ const future = require('./utils/future');
 const objects = require('./utils/objects');
 const schemaFormatter = require('./utils/schemaFormatter');
 const SchemaType = require('./utils/SchemaType');
-const uint64 = require('./utils/uint64');
 const size = require('./modelBinary/sizes');
+const uint64 = require('./utils/uint64');
 
 const catapultSdk = {
 	auth,
