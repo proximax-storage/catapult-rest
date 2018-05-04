@@ -43,6 +43,7 @@ const PacketType = {
 	/** Detached cosignatures have been pushed by an api-node. */
 	pushDetachedCosignatures: 501,
 
+	/** Node information has been requested by a peer */
 	nodeDiscoveryPullPing: 601
 };
 

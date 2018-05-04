@@ -23,6 +23,21 @@ const catapult = require('catapult-sdk');
 
 const { PacketParser } = catapult.parser;
 
+const rejectOnClose = reject => () => reject(errors.createServiceUnavailableError('connection failed'));
+
+const listen = connection => new Promise((resolve, reject) => {
+
+	const packetParser = new PacketParser();
+
+	connection.once('close', rejectOnClose(reject));
+
+	connection.on('data', data => {
+		packetParser.push(data);
+	});
+
+	packetParser.onPacket(resolve);
+});
+
 /**
  * A catapult connection for interacting with api nodes.
  * @class CatapultConnection
@@ -41,41 +56,21 @@ module.exports = {
 		 */
 		send: payload =>
 			new Promise((resolve, reject) => {
-				const rejectOnClose = () => {
-					reject(errors.createServiceUnavailableError('connection failed'));
-				};
 
-				connection.once('close', rejectOnClose);
+				connection.once('close', rejectOnClose(reject));
 				connection.write(payload, () => {
-					connection.removeListener('close', rejectOnClose);
+					connection.removeListener('close', rejectOnClose(reject));
 					resolve();
 				});
 			}),
 
-		listen: () => new Promise((resolve, reject) => {
-			const rejectOnClose = () => {
-				reject(errors.createServiceUnavailableError('connection failed'));
-			};
-
-			const packetParser = new PacketParser();
-
-			connection.once('close', rejectOnClose);
-
-			connection.on('data', data => {
-				packetParser.push(data);
-			});
-
-			packetParser.onPacket(resolve);
-		}),
-
 		pushPull(payload) {
 			return new Promise((resolve, reject) => {
-				this.listen().then(packet => {
+				listen(connection).then(packet => {
 					resolve(packet);
 				}, reject);
 				/* eslint-disable no-unused-vars */
-				this.send(payload).then(ignored => {
-				}, reject);
+				this.send(payload).then(ignored => {}, reject);
 				/* eslint-enable */
 			});
 		}

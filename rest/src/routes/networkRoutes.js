@@ -19,11 +19,11 @@
  */
 
 const catapult = require('catapult-sdk');
+const nodeInfoCodec = require('../sockets/nodeInfoCodec');
 
 const packetHeader = catapult.packet.header;
 const { PacketType } = catapult.packet;
 
-const { nodeInfoCodec } = catapult.packet.packetCodecs;
 const { BinaryParser } = catapult.parser;
 
 module.exports = {

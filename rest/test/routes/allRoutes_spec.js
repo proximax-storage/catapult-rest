@@ -55,6 +55,7 @@ describe('all routes', () => {
 			'/chain/score',
 
 			'/network',
+			'/network/info',
 
 			'/transaction/:transactionId',
 			'/transaction/:hash/status',
