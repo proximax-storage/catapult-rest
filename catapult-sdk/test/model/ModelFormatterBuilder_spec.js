@@ -49,7 +49,8 @@ describe('model formatter builder', () => {
 
 				'chainInfo',
 				'storageInfo',
-				'transactionStatus'
+				'transactionStatus',
+				'merkleProofInfo'
 			]);
 		});
 

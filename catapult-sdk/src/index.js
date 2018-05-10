@@ -20,6 +20,7 @@
 
 const { createKeyPairFromPrivateKeyString, sign, verify } = require('./crypto/keyPair');
 const sha3Hasher = require('./crypto/sha3Hasher');
+const merkle = require('./crypto/merkle-audit-proof');
 const auth = require('./auth/auth');
 const address = require('./model/address');
 const EntityType = require('./model/EntityType');
@@ -56,7 +57,8 @@ const catapultSdk = {
 		createKeyPairFromPrivateKeyString,
 		sign,
 		verify,
-		sha3Hasher
+		sha3Hasher,
+		merkle
 	},
 	model: {
 		address,

@@ -73,6 +73,7 @@ describe('model schema builder', () => {
 				'blockHeaderMetadata',
 				'blockHeaderWithMetadata',
 
+				'merkleProofInfo',
 				'transaction',
 				'transactionMetadata',
 				'transactionWithMetadata',

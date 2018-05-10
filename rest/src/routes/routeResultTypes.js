@@ -27,6 +27,7 @@ module.exports = {
 	// other
 	transactionStatus: 'transactionStatus',
 	chainInfo: 'chainInfo',
+	merkleProofInfo: 'merkleProofInfo',
 
 	// diagnostic
 	storageInfo: 'storageInfo'

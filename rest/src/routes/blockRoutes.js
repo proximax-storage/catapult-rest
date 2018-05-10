@@ -18,13 +18,23 @@
  * along with Catapult.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const catapult = require('catapult-sdk');
 const dbFacade = require('./dbFacade');
 const routeResultTypes = require('./routeResultTypes');
 const routeUtils = require('./routeUtils');
 const errors = require('../server/errors');
 
-const parseHeight = params => routeUtils.parseArgument(params, 'height', 'uint');
+const { convert } = catapult.utils;
+const { constants } = catapult;
+const { buildAuditPath, getRootHash, HashNotFoundError } = catapult.crypto.merkle;
 
+const parseHeight = params => routeUtils.parseArgument(params, 'height', 'uint');
+const parseHash = params => {
+	if (constants.sizes.hash512 === params.hash.length)
+		return params.hash;
+
+	throw errors.createInvalidArgumentError(`invalid length of hash '${params.hash.length}'`);
+};
 const getLimit = (validLimits, params) => {
 	const limit = routeUtils.parseArgument(params, 'limit', 'uint');
 	return -1 === validLimits.indexOf(limit) ? undefined : limit;
@@ -72,6 +82,47 @@ module.exports = {
 					}
 
 					return routeUtils.createSender(routeResultTypes.transfer).sendArray('height', res, next)(result.payload);
+				});
+		});
+
+		server.get('/block/:height/transaction/:hash/merkle', (req, res, next) => {
+			const height = parseHeight(req.params);
+			const hash = parseHash(req.params);
+
+			return dbFacade.runHeightDependentOperation(db, height, () => db.blockWithMerkleTreeAtHeight(height))
+				.then(result => {
+					if (!result.isRequestValid || result.payload === undefined) {
+						res.send(errors.createNotFoundError(height));
+						return next();
+					}
+
+					const block = result.payload;
+					if (!block.meta.merkleTree)
+						throw errors.createInvalidArgumentError(`hash '${req.params.hash}' not included in block height '${height}'`);
+
+					const merkleTree = {
+						numberOfTransactions: block.meta.numTransactions,
+						tree: block.meta.merkleTree.map(merkleHash => convert.uint8ToHex(merkleHash.buffer))
+					};
+
+					let merklePath;
+					try {
+						merklePath = buildAuditPath(hash, merkleTree);
+					} catch (error) {
+						if (error instanceof HashNotFoundError)
+							throw errors.createInvalidArgumentError(`hash '${req.params.hash}' not included in block height '${height}'`);
+						else
+							throw error;
+					}
+
+					res.send({
+						payload: {
+							rootHash: getRootHash(merkleTree),
+							merklePath
+						},
+						type: routeResultTypes.merkleProofInfo
+					});
+					return next();
 				});
 		});
 	}

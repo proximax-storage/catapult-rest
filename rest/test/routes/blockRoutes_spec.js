@@ -122,4 +122,48 @@ describe('block routes', () => {
 			pagingTestsFactory.addNonPagingParamFailureTest('height', '-1');
 		});
 	});
+
+	describe('block with merkle tree', () => {
+		const builder = test.route.document.prepareGetDocumentRouteTests(blockRoutes.register, {
+			route: '/block/:height/transaction/:hash/merkle',
+			dbApiName: 'blockWithMerkleTreeAtHeight',
+			type: 'merkleProofInfo',
+			extendDb: addChainInfoToDb,
+			config: routeConfig,
+			payloadTemplate: {
+				meta: {
+					numTransactions: 1,
+					merkleTree: ['886F70593E0D962EB771C16E738FC62E23A288E8C439BF9EC1D3F3775A9DFD5E']
+				}
+			}
+		});
+		builder.addDefault({
+			valid: {
+				object: {
+					height: '3',
+					hash: '886F70593E0D962EB771C16E738FC62E23A288E8C439BF9EC1D3F3775A9DFD5E'
+				},
+				parsed: [3],
+				printable: '3'
+			},
+			invalid: {
+				object: {
+					height: '10A',
+					hash: '886F70593E0D962EB771C16E738FC62E23A288E8C439BF9EC1D3F3775A9DFD5E'
+				},
+				error: 'height has an invalid format'
+			}
+		});
+		builder.addNotFoundInputTest(
+			{
+				object: {
+					height: '11',
+					hash: '886F70593E0D962EB771C16E738FC62E23A288E8C439BF9EC1D3F3775A9DFD5E'
+				},
+				parsed: [11],
+				printable: '11'
+			},
+			'chain height is too small'
+		);
+	});
 });
