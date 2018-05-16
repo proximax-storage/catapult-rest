@@ -33,7 +33,7 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "catapult-sdk": "link:../catapult-sdk",
+    "catapult-sdk": "file:../catapult-sdk",
     "mongodb": "^3.0.3",
     "restify": "^6.3.4",
     "restify-errors": "^6.0.0",
